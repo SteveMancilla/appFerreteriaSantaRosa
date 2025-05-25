@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "185078444414",
+    "project_id": "app-ferreteria-aea05",
+    "storage_bucket": "app-ferreteria-aea05.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185078444414:android:32feb33592059b1666032f",
+        "android_client_info": {
+          "package_name": "com.example.appferreteriasantarosa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHOeO-8-fiTDkcqAzrFjodr86nLinxGHQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
