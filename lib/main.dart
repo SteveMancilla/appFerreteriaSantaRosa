@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-//import '../firebase_options.dart'; // generado por Firebase CLI
+import 'package:provider/provider.dart';
+
+import 'providers/carrito_provider.dart';
+
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/productos_screen.dart';
 import 'screens/historial_screen.dart';
+import 'screens/carrito_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,23 +23,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'App Móvil',
-      theme: ThemeData(
-        primaryColor: const Color(0xFF031059),
-        scaffoldBackgroundColor: const Color(0xFFF2F2F2),
-        fontFamily: 'Roboto',
+    return ChangeNotifierProvider(
+      create: (_) => CarritoProvider(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'App Móvil',
+        theme: ThemeData(
+          primaryColor: const Color(0xFF031059),
+          scaffoldBackgroundColor: const Color(0xFFF2F2F2),
+          fontFamily: 'Roboto',
+        ),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const SplashScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterScreen(),
+          '/home': (context) => const HomeScreen(),
+          '/productos': (context) => const ProductosScreen(),
+          '/historial': (context) => const HistorialScreen(),
+          '/carrito': (context) => const CarritoScreen(),
+        },
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/home': (context) => const HomeScreen(),
-        '/productos': (context) => const ProductosScreen(),
-        '/historial': (context) => const HistorialScreen(),
-      },
     );
   }
 }

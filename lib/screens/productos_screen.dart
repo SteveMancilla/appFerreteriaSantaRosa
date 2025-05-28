@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/carrito_item.dart';
+import '../providers/carrito_provider.dart';
 import 'producto_detalle_screen.dart';
 
 class ProductosScreen extends StatefulWidget {
@@ -165,7 +168,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
           padding: const EdgeInsets.only(top: 10),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            mainAxisExtent: 270,
+            mainAxisExtent: 320,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
           ),
@@ -229,6 +232,31 @@ class _ProductosScreenState extends State<ProductosScreen> {
                             style: const TextStyle(fontWeight: FontWeight.bold)),
                       if (data['oferta'] == true)
                         const Text('¡En oferta!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          final carrito = Provider.of<CarritoProvider>(context, listen: false);
+                          carrito.agregarProducto(
+                            CarritoItem(
+                              id: data['nombre'],
+                              nombre: data['nombre'],
+                              descripcion: data['descripcion'],
+                              precio: precioFinal,
+                              cantidad: 1,
+                              imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.add_shopping_cart),
+                        label: const Text('Agregar'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF031059),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                          textStyle: const TextStyle(fontSize: 12),
+                        ),
+                      ),
                     ],
                   ),
                 ),

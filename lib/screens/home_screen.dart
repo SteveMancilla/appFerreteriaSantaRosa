@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/carrito_provider.dart';
+import '../models/carrito_item.dart';
 import 'producto_detalle_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -37,6 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Historial de Compras', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.pushNamed(context, '/historial');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.map, color: Colors.white),
+              title: const Text('Ubicación', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pushNamed(context, '/ubicacion');
               },
             ),
             ListTile(
@@ -244,7 +254,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       Container(
                         margin: const EdgeInsets.only(top: 8),
                         child: ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: () {
+                            Provider.of<CarritoProvider>(context, listen: false).agregarProducto(
+                              CarritoItem(
+                                nombre: data['nombre'],
+                                descripcion: data['descripcion'],
+                                id: doc.id,
+                                precio: precioDescuento,
+                                imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
+                                cantidad: 1,
+                              ),
+                            );
+                          },
                           icon: const Icon(Icons.shopping_cart_checkout),
                           label: const Text('Añadir al carrito'),
                           style: ElevatedButton.styleFrom(

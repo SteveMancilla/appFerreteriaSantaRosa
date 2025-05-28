@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/carrito_provider.dart';
+import '../models/carrito_item.dart';
 
 class ProductoDetalleScreen extends StatelessWidget {
   final String nombre;
@@ -54,7 +57,6 @@ class ProductoDetalleScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          // Precio original (tachado si hay oferta)
           if (oferta && descuento > 0)
             Text(
               'S/. ${precio.toStringAsFixed(2)}',
@@ -65,7 +67,6 @@ class ProductoDetalleScreen extends StatelessWidget {
               ),
             ),
 
-          // Precio con descuento o normal
           Text(
             'S/. ${precioFinal.toStringAsFixed(2)}',
             style: TextStyle(
@@ -97,7 +98,21 @@ class ProductoDetalleScreen extends StatelessWidget {
           const SizedBox(height: 30),
           ElevatedButton.icon(
             onPressed: () {
-              // lógica de añadir al carrito
+              Provider.of<CarritoProvider>(context, listen: false).agregarProducto(
+                CarritoItem(
+                  nombre: nombre,
+                  id: DateTime.now().toString(), // Generar un ID único
+                  descripcion: descripcion,
+                  imagenUrl: imagenUrl,
+                  precio: precioFinal,
+                ),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Producto añadido al carrito'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
             },
             icon: const Icon(Icons.add_shopping_cart),
             label: const Text('Agregar al Carrito'),
