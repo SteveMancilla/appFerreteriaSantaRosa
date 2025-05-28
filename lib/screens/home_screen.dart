@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (_) => ProductoDetalleScreen(
                 nombre: data['nombre'],
                 descripcion: data['descripcion'],
-                precio: data['precio'],
+                precio: (data['precio'] as num).toDouble(),  //solucion para el error de tipo
                 imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
                 oferta: data['oferta'] ?? false,
                 descuento: data['descuento'] ?? 0,
