@@ -20,22 +20,36 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF2D3540),
         child: ListView(
           padding: EdgeInsets.zero,
-          children: const [
-            DrawerHeader(
+          children: [
+            const DrawerHeader(
               decoration: BoxDecoration(color: Color(0xFF031059)),
               child: Text('Menú Principal', style: TextStyle(color: Colors.white, fontSize: 20)),
             ),
             ListTile(
-              leading: Icon(Icons.home, color: Colors.white),
-              title: Text('Inicio', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.home, color: Colors.white),
+              title: const Text('Inicio', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/home');
+              },
             ),
             ListTile(
-              leading: Icon(Icons.settings, color: Colors.white),
-              title: Text('Configuración', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.history, color: Colors.white),
+              title: const Text('Historial de Compras', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pushNamed(context, '/historial');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings, color: Colors.white),
+              title: const Text('Configuración', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pushNamed(context, '/ajustes');
+              },
             ),
           ],
         ),
       ),
+
       appBar: AppBar(
         backgroundColor: const Color(0xFF031059),
         elevation: 0,
@@ -48,7 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/carrito'); // Navegar al carrito
+            },
           ),
         ],
       ),
@@ -124,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: 0,
         onTap: (index){
           if (index == 0) {
-            Navigator.pushReplacementNamed(context, '/home');
+            // esta es la pantalla de inicio, no hacemos nada
           } else if (index == 1) {
             Navigator.pushReplacementNamed(context, '/productos');
           } else if (index == 2) {
