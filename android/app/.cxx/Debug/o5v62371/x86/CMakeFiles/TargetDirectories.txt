@@ -1,0 +1,2 @@
+D:/appFerreteriaSantaRosa/android/app/.cxx/Debug/o5v62371/x86/CMakeFiles/edit_cache.dir
+D:/appFerreteriaSantaRosa/android/app/.cxx/Debug/o5v62371/x86/CMakeFiles/rebuild_cache.dir
