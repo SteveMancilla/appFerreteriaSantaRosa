@@ -17,11 +17,15 @@ class ProductoDetalleScreen extends StatelessWidget {
     required this.imagenUrl,
     this.oferta = false,
     this.descuento = 0,
-    this.caracteristicas, // nuevo
+    this.caracteristicas,
   });
 
   @override
   Widget build(BuildContext context) {
+    final double precioFinal = oferta && descuento > 0
+        ? precio * (1 - descuento / 100)
+        : precio;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
       appBar: AppBar(
@@ -32,7 +36,7 @@ class ProductoDetalleScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {
-              // Aquí implementarás la lógica de compartir
+              // lógica de compartir
             },
           )
         ],
@@ -49,18 +53,38 @@ class ProductoDetalleScreen extends StatelessWidget {
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
+
+          // Precio original (tachado si hay oferta)
+          if (oferta && descuento > 0)
+            Text(
+              'S/. ${precio.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 18,
+                decoration: TextDecoration.lineThrough,
+                color: Colors.grey,
+              ),
+            ),
+
+          // Precio con descuento o normal
           Text(
-            'S/. $precio',
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            'S/. ${precioFinal.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: oferta && descuento > 0 ? Colors.red : Colors.black,
+            ),
           ),
+
           if (oferta)
             const Text('¡En oferta!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+
           const SizedBox(height: 12),
           Text(
             descripcion,
             style: const TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 20),
+
           if (caracteristicas != null && caracteristicas!.isNotEmpty) ...[
             const Text(
               'Características',
@@ -69,9 +93,12 @@ class ProductoDetalleScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(caracteristicas!, style: const TextStyle(fontSize: 15)),
           ],
+
           const SizedBox(height: 30),
           ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              // lógica de añadir al carrito
+            },
             icon: const Icon(Icons.add_shopping_cart),
             label: const Text('Agregar al Carrito'),
             style: ElevatedButton.styleFrom(

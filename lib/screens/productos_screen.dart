@@ -21,22 +21,22 @@ class _ProductosScreenState extends State<ProductosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 218, 204, 228), // grisAzulado
+      backgroundColor: const Color.fromARGB(255, 218, 204, 228),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF031059), // azulOscuro
+        backgroundColor: const Color(0xFF031059),
         title: const Text('Listado de Productos', style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: (){
-            Navigator.pushReplacementNamed(context, '/home'); // Volver a la pantalla anterior
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/home');
           },
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart, color: Colors.white),
             onPressed: () {
-              Navigator.pushNamed(context, '/carrito'); // Navegar al carrito
+              Navigator.pushNamed(context, '/carrito');
             },
           ),
         ],
@@ -56,10 +56,9 @@ class _ProductosScreenState extends State<ProductosScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) {
-          if (index == 0){
+          if (index == 0) {
             Navigator.pushNamed(context, '/home');
           } else if (index == 1) {
-            // Ya estamos en la pantalla de productos
           } else if (index == 2) {
             Navigator.pushNamed(context, '/notificaciones');
           } else if (index == 3) {
@@ -166,67 +165,78 @@ class _ProductosScreenState extends State<ProductosScreen> {
           padding: const EdgeInsets.only(top: 10),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            mainAxisExtent: 260,
+            mainAxisExtent: 270,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
           ),
           itemCount: productos.length,
           itemBuilder: (context, index) {
-            final producto = productos[index].data() as Map<String, dynamic>;
-            return _buildCard(producto);
+            final data = productos[index].data() as Map<String, dynamic>;
+            final precio = (data['precio'] as num).toDouble();
+            final descuento = (data['descuento'] ?? 0) as int;
+            final precioFinal = (descuento > 0) ? precio * (1 - descuento / 100) : precio;
+
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProductoDetalleScreen(
+                      nombre: data['nombre'],
+                      descripcion: data['descripcion'],
+                      precio: precio,
+                      imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
+                      oferta: data['oferta'] ?? false,
+                      descuento: descuento,
+                      caracteristicas: data['caracteristicas']?.toString(),
+                    ),
+                  ),
+                );
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 4,
+                color: const Color(0xFFF7F1FA),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(data['nombre'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text(data['descripcion'], maxLines: 2, overflow: TextOverflow.ellipsis),
+                      const SizedBox(height: 4),
+                      if (descuento > 0) ...[
+                        Text('S/ ${precio.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                              decoration: TextDecoration.lineThrough,
+                            )),
+                        Text('S/ ${precioFinal.toStringAsFixed(2)}',
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                      ] else
+                        Text('S/ ${precio.toStringAsFixed(2)}',
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
+                      if (data['oferta'] == true)
+                        const Text('¡En oferta!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+              ),
+            );
           },
         );
       },
-    );
-  }
-
-  Widget _buildCard(Map<String, dynamic> data) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ProductoDetalleScreen(
-              nombre: data['nombre'],
-              descripcion: data['descripcion'],
-              precio: (data['precio'] as num).toDouble(),
-              imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
-              oferta: data['oferta'] ?? false,
-              descuento: data['descuento'] ?? 0,
-              caracteristicas: data['caracteristicas']?.toString(),
-            ),
-          ),
-        );
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 4,
-        color: const Color(0xFFF7F1FA),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
-                  height: 100,
-                  width: 100,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(data['nombre'], style: const TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              Text(data['descripcion'], maxLines: 2, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 4),
-              Text('S/ ${data['precio']}', style: const TextStyle(fontWeight: FontWeight.bold)),
-              if(data['oferta'] == true)
-                const Text('¡En oferta!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

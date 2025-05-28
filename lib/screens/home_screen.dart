@@ -49,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-
       appBar: AppBar(
         backgroundColor: const Color(0xFF031059),
         elevation: 0,
@@ -63,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.shopping_cart, color: Colors.white),
             onPressed: () {
-              Navigator.pushNamed(context, '/carrito'); // Navegar al carrito
+              Navigator.pushNamed(context, '/carrito');
             },
           ),
         ],
@@ -91,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const Text('PRODUCTOS DESTACADOS', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           const SizedBox(height: 10),
           SizedBox(
-            height: 220,
+            height: 230,
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('productos')
@@ -138,17 +137,17 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
-        onTap: (index){
-          if (index == 0) {
-            // esta es la pantalla de inicio, no hacemos nada
-          } else if (index == 1) {
+        onTap: (index) {
+          if (index == 1) {
             Navigator.pushReplacementNamed(context, '/productos');
           } else if (index == 2) {
-            // Aquí puedes agregar la lógica para Notificaciones
+            Navigator.pushReplacementNamed(context, '/notificaciones');
           } else if (index == 3) {
-            // Aquí puedes agregar la lógica para Ajustes
+            Navigator.pushReplacementNamed(context, '/ajustes');
           } else if (index == 4) {
-            // Aquí puedes agregar la lógica para Perfil
+            Navigator.pushReplacementNamed(context, '/perfil');
+          } else {
+            Navigator.pushReplacementNamed(context, '/home');
           }
         },
         selectedItemColor: const Color(0xFF031059),
@@ -166,6 +165,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildProductoCard(BuildContext context, QueryDocumentSnapshot doc, {bool showButton = true}) {
     final data = doc.data() as Map<String, dynamic>;
+    final double precio = (data['precio'] as num).toDouble();
+    final int descuento = data['descuento'] ?? 0;
+    final bool enOferta = data['oferta'] ?? false;
+    final double precioDescuento = enOferta && descuento > 0 ? precio - (precio * descuento / 100) : precio;
 
     return GestureDetector(
       onTap: () {
@@ -176,10 +179,10 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (_) => ProductoDetalleScreen(
                 nombre: data['nombre'],
                 descripcion: data['descripcion'],
-                precio: (data['precio'] as num).toDouble(),  //solucion para el error de tipo
+                precio: precio,
                 imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
-                oferta: data['oferta'] ?? false,
-                descuento: data['descuento'] ?? 0,
+                oferta: enOferta,
+                descuento: descuento,
                 caracteristicas: data['caracteristicas']?.toString(),
               ),
             ),
@@ -214,8 +217,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 4),
                     Text(data['descripcion'], maxLines: 2, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 4),
-                    Text('S/ ${data['precio']}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    if (data['oferta'] == true)
+                    if (enOferta && descuento > 0) ...[
+                      Text(
+                        'S/ $precio',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        'S/ ${precioDescuento.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ] else ...[
+                      Text('S/ ${precio.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ],
+                    if (enOferta)
                       const Text('¡En oferta!', style: TextStyle(color: Colors.red)),
                     if (showButton)
                       Container(
