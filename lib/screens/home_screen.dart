@@ -121,6 +121,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        onTap: (index){
+          if (index == 0) {
+            Navigator.pushReplacementNamed(context, '/home');
+          } else if (index == 1) {
+            Navigator.pushReplacementNamed(context, '/productos');
+          } else if (index == 2) {
+            // Aquí puedes agregar la lógica para Notificaciones
+          } else if (index == 3) {
+            // Aquí puedes agregar la lógica para Ajustes
+          } else if (index == 4) {
+            // Aquí puedes agregar la lógica para Perfil
+          }
+        },
         selectedItemColor: const Color(0xFF031059),
         unselectedItemColor: Colors.grey,
         items: const [

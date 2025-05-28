@@ -5,6 +5,8 @@ class ProductoDetalleScreen extends StatelessWidget {
   final String descripcion;
   final double precio;
   final String imagenUrl;
+  final bool oferta;
+  final int descuento;
 
   const ProductoDetalleScreen({
     super.key,
@@ -12,6 +14,8 @@ class ProductoDetalleScreen extends StatelessWidget {
     required this.descripcion,
     required this.precio,
     required this.imagenUrl,
+    this.oferta = false,
+    this.descuento = 0,
   });
 
   @override

@@ -1,0 +1,196 @@
+import 'package:appferreteriasantarosa/screens/producto_detalle_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
+class ProductosScreen extends StatefulWidget {
+  const ProductosScreen({super.key});
+
+  @override
+  State<ProductosScreen> createState() => _ProductosScreenState();
+}
+
+class _ProductosScreenState extends State<ProductosScreen> {
+  final TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
+  String tipoSeleccionado = 'Todos';
+  bool filtrarOferta = false;
+
+  final List<String> tipos = ['Todos', 'Carpintería', 'Construcción', 'Mecánica'];
+
+  int currentIndex = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF2D3540),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF031059),
+        title: const Text('Listado de Productos'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _buildSearchBar(),
+            const SizedBox(height: 10),
+            _buildFiltros(),
+            const SizedBox(height: 16),
+            Expanded(child: _buildListaProductos()),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
+        onTap: (index) {
+          if (index == 0) Navigator.pushReplacementNamed(context, '/');
+        },
+        selectedItemColor: const Color(0xFF031059),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+          BottomNavigationBarItem(icon: Icon(Icons.sell), label: 'Productos'),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notificaciones'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: TextField(
+        controller: searchController,
+        onChanged: (value) => setState(() => searchQuery = value.toLowerCase()),
+        decoration: const InputDecoration(
+          icon: Icon(Icons.search),
+          hintText: 'Buscar producto',
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFiltros() {
+    return Row(
+      children: [
+        Expanded(
+          child: DropdownButtonFormField<String>(
+            value: tipoSeleccionado,
+            dropdownColor: Colors.white,
+            decoration: const InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              labelText: 'Tipo',
+              border: OutlineInputBorder(),
+            ),
+            items: tipos.map((tipo) {
+              return DropdownMenuItem(value: tipo, child: Text(tipo));
+            }).toList(),
+            onChanged: (value) => setState(() => tipoSeleccionado = value!),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Checkbox(
+          value: filtrarOferta,
+          activeColor: const Color(0xFF8D6AD9),
+          onChanged: (value) => setState(() => filtrarOferta = value ?? false),
+        ),
+        const Text('Oferta', style: TextStyle(color: Colors.white)),
+      ],
+    );
+  }
+
+  Widget _buildListaProductos() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('productos')
+          .where('disponible', isEqualTo: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+
+        final productos = snapshot.data!.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final nombre = data['nombre'].toString().toLowerCase();
+          final tipo = data['tipo']?.toString().toLowerCase();
+          final oferta = data['oferta'] ?? false;
+
+          final coincideBusqueda = nombre.contains(searchQuery);
+          final coincideTipo = tipoSeleccionado == 'Todos' || tipo == tipoSeleccionado.toLowerCase();
+          final coincideOferta = !filtrarOferta || oferta == true;
+
+          return coincideBusqueda && coincideTipo && coincideOferta;
+        }).toList();
+
+        if (productos.isEmpty) {
+          return const Center(child: Text('No se encontraron productos', style: TextStyle(color: Colors.white)));
+        }
+
+        return GridView.builder(
+          padding: const EdgeInsets.only(top: 10),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisExtent: 220,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemCount: productos.length,
+          itemBuilder: (context, index) {
+            final producto = productos[index].data() as Map<String, dynamic>;
+            return _buildCard(producto);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildCard(Map<String, dynamic> data) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductoDetalleScreen(
+              nombre: data['nombre'],
+              descripcion: data['descripcion'],
+              precio: (data['precio'] as num).toDouble(),
+              imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
+              oferta: data['oferta'] ?? false,
+              descuento: data['descuento'] ?? 0,
+            ),
+          ),
+        );
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 3,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
+                  height: 100,
+                  width: 100,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(data['nombre'], style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text('S/ ${data['precio']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
