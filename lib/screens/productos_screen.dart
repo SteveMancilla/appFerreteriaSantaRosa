@@ -191,6 +191,9 @@ class _ProductosScreenState extends State<ProductosScreen> {
               descripcion: data['descripcion'],
               precio: (data['precio'] as num).toDouble(),
               imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
+              oferta: data['oferta'] ?? false,
+              descuento: data['descuento'] ?? 0,
+              caracteristicas: data['caracteristicas']?.toString(),
             ),
           ),
         );

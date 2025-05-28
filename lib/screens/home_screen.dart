@@ -178,6 +178,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 descripcion: data['descripcion'],
                 precio: data['precio'],
                 imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
+                oferta: data['oferta'] ?? false,
+                descuento: data['descuento'] ?? 0,
+                caracteristicas: data['caracteristicas']?.toString(),
               ),
             ),
           );
