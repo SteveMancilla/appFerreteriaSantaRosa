@@ -1,0 +1,2 @@
+D:/Proyecto/app moviles/appFerreteriaSantaRosa/android/app/.cxx/Debug/4i2h4w5j/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/Proyecto/app moviles/appFerreteriaSantaRosa/android/app/.cxx/Debug/4i2h4w5j/armeabi-v7a/CMakeFiles/rebuild_cache.dir
