@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/carrito_provider.dart';
@@ -36,6 +37,13 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.person, color: Colors.white),
+              title: const Text('Perfil', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/perfil');
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.history, color: Colors.white),
               title: const Text('Historial de Compras', style: TextStyle(color: Colors.white)),
               onTap: () {
@@ -56,6 +64,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.pushNamed(context, '/ajustes');
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.exit_to_app, color: Colors.white),
+              title: const Text('Cerrar Sesión', style: TextStyle(color: Colors.white)),
+              onTap: () async{
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+            ),
           ],
         ),
       ),
@@ -69,10 +85,34 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart, color: Colors.white),
-            onPressed: () {
-              Navigator.pushNamed(context, '/carrito');
+          Consumer<CarritoProvider>(
+            builder: (context, carritoProvider, child) {
+              return IconButton(
+                icon: Stack(
+                  children: [
+                    const Icon(Icons.shopping_cart, color: Colors.white),
+                    if (carritoProvider.itemsCount > 0)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            carritoProvider.itemsCount.toString(),
+                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/carrito');
+                },
+              );
             },
           ),
         ],
@@ -264,6 +304,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
                                 cantidad: 1,
                               ),
+                            );
+
+                            // Mostrar un SnackBar con el mensaje de confirmación
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Producto agregado al carrito')),
                             );
                           },
                           icon: const Icon(Icons.shopping_cart_checkout),

@@ -36,12 +36,44 @@ class ProductoDetalleScreen extends StatelessWidget {
         title: Text(nombre, style: const TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          // Icono de compartir
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {
-              // lógica de compartir
+              // Lógica para compartir
             },
-          )
+          ),
+          // Icono del carrito con el contador
+          Consumer<CarritoProvider>(
+            builder: (context, carritoProvider, child) {
+              return IconButton(
+                icon: Stack(
+                  children: [
+                    const Icon(Icons.shopping_cart, color: Colors.white),
+                    if (carritoProvider.itemsCount > 0)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            carritoProvider.itemsCount.toString(),
+                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/carrito');
+                },
+              );
+            },
+          ),
         ],
       ),
       body: ListView(

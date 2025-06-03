@@ -36,10 +36,34 @@ class _ProductosScreenState extends State<ProductosScreen> {
           },
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart, color: Colors.white),
-            onPressed: () {
-              Navigator.pushNamed(context, '/carrito');
+          Consumer<CarritoProvider>(
+            builder: (context, carritoProvider, child) {
+              return IconButton(
+                icon: Stack(
+                  children: [
+                    const Icon(Icons.shopping_cart, color: Colors.white),
+                    if (carritoProvider.itemsCount > 0)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            carritoProvider.itemsCount.toString(),
+                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/carrito');
+                },
+              );
             },
           ),
         ],
@@ -245,6 +269,10 @@ class _ProductosScreenState extends State<ProductosScreen> {
                               cantidad: 1,
                               imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
                             ),
+                          );
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Producto agregado al carrito')),
                           );
                         },
                         icon: const Icon(Icons.add_shopping_cart),
