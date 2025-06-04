@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -18,6 +21,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String error = '';
   bool cargando = false;
+  XFile? _imagen; // Variable para guardar la imagen seleccionada
+
+  // Método para obtener la ubicación del directorio
+  Future<String> _getLocalPath() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  // Método para guardar la imagen localmente
+  Future<void> _guardarImagen() async {
+    if (_imagen != null) {
+      final path = await _getLocalPath();
+      final fileName = DateTime.now().toString() + '.jpg'; // Generar un nombre único
+      final file = File('$path/$fileName');
+
+      // Guarda la imagen localmente
+      await file.writeAsBytes(await _imagen!.readAsBytes());
+
+      // Aquí puedes guardar la URL local de la imagen en Firestore, si es necesario
+      // await FirebaseFirestore.instance.collection('usuarios').doc(userId).update({
+      //   'imagenUrl': file.path,
+      // });
+    }
+  }
+
+  // Método para seleccionar la imagen desde la galería
+  Future<void> _seleccionarImagen() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imagen = pickedFile;  // Actualiza la imagen seleccionada
+      });
+    }
+  }
+
+  // Método para tomar la foto con la cámara
+  Future<void> _tomarFoto() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _imagen = pickedFile;  // Actualiza la imagen tomada
+      });
+    }
+  }
 
   Future<void> registrarUsuario() async {
     final nombre = nombreController.text.trim();
@@ -46,11 +93,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: password,
       );
 
+      // Guardar la imagen si se ha seleccionado una
+      if (_imagen != null) {
+        await _guardarImagen();
+      }
+
       await FirebaseFirestore.instance.collection('usuarios').doc(cred.user!.uid).set({
         'nombres': nombre,
         'apellidos': apellido,
         'correo': correo,
-        'imagenUrl': null, // no se usa imagen personalizada
+        'imagenUrl': _imagen != null ? _imagen!.path : null, // Guardamos la URL local de la imagen
       });
 
       Navigator.pushReplacementNamed(context, '/home');
@@ -75,10 +127,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const Text('CREAR UNA CUENTA',
                       style: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 24),
-                  const CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Color(0xFF8D6AD9),
-                    child: Icon(Icons.person, size: 60, color: Colors.white),
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundColor: const Color(0xFF8D6AD9),
+                        child: _imagen == null
+                            ? const Icon(Icons.person, size: 60, color: Colors.white)
+                            : ClipOval(
+                                child: Image.file(
+                                  File(_imagen!.path),
+                                  fit: BoxFit.cover,
+                                  width: 120,
+                                  height: 120,
+                                ),
+                              ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            _seleccionarImagen(); // Llamada a la función de la galería
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: Colors.white,
+                            radius: 20,
+                            child: const Icon(Icons.edit, size: 18, color: Colors.black), // Ícono del lápiz
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            _tomarFoto(); // Llamada a la función para tomar foto con la cámara
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: Colors.white,
+                            radius: 20,
+                            child: const Icon(Icons.camera_alt, size: 18, color: Colors.black), // Ícono de la cámara
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   _campo('Nombres', nombreController),

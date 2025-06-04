@@ -39,7 +39,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   font_awesome_flutter: ^10.4.0  # Font Awesome Icons - steven
-  #image_picker: ^1.0.4
+  #perfil de user
+  image_picker: ^0.8.5+3
+  path_provider: ^2.0.8
   #carousel_slider: ^4.2.1
   provider: ^6.1.1
   #mapas
