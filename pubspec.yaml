@@ -42,6 +42,7 @@ dependencies:
   #perfil de user
   image_picker: ^0.8.5+3
   path_provider: ^2.0.8
+  shared_preferences: ^2.0.15
   #carousel_slider: ^4.2.1
   provider: ^6.1.1
   #mapas

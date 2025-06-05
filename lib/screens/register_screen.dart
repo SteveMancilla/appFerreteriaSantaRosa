@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -93,23 +94,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: password,
       );
 
-      // Guardar la imagen si se ha seleccionado una
+      // Guardar imagen si hay
+      String? imagenRuta;
       if (_imagen != null) {
         await _guardarImagen();
+        imagenRuta = _imagen!.path;
       }
 
+      // Guardar en Firestore
       await FirebaseFirestore.instance.collection('usuarios').doc(cred.user!.uid).set({
         'nombres': nombre,
         'apellidos': apellido,
         'correo': correo,
-        'imagenUrl': _imagen != null ? _imagen!.path : null, // Guardamos la URL local de la imagen
+        'imagenUrl': imagenRuta,
       });
 
-      Navigator.pushReplacementNamed(context, '/home');
+      // Guardar en SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('ultimaImagen', imagenRuta ?? '');
+      await prefs.setString('ultimoCorreo', correo);
+
+      Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
-      setState(() => error = 'Error: ${e.toString()}');
+        setState(() => error = 'Error: ${e.toString()}');
     } finally {
-      setState(() => cargando = false);
+        setState(() => cargando = false);
     }
   }
 
