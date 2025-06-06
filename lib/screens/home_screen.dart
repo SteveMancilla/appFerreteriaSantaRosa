@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../providers/carrito_provider.dart';
 import '../models/carrito_item.dart';
 import 'producto_detalle_screen.dart';
+import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +18,26 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final searchController = TextEditingController();
   String searchQuery = '';
+
+  // Variables para almacenar datos del usuario para lo del perfil
+  String? rutaImagen;
+  String? nombreUsuario;
+
+  // Método para cargar los datos del usuario desde SharedPreferences
+  Future<void> cargarDatosUsuario() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      nombreUsuario = prefs.getString('ultimoNombre');
+      rutaImagen = prefs.getString('ultimaImagen');
+    });
+  }
+
+  // cargar datos del usuario al iniciar la pantalla
+  @override
+  void initState() {
+    super.initState();
+    cargarDatosUsuario();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF031059),
         elevation: 0,
+        toolbarHeight: 85,
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu, color: Colors.white),
@@ -87,35 +110,58 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           Consumer<CarritoProvider>(
             builder: (context, carritoProvider, child) {
-              return IconButton(
-                icon: Stack(
-                  children: [
-                    const Icon(Icons.shopping_cart, color: Colors.white),
-                    if (carritoProvider.itemsCount > 0)
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(3),
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
+              return Row(
+                children: [
+                  // Ícono del carrito
+                  IconButton(
+                    icon: Stack(
+                      children: [
+                        const Icon(Icons.shopping_cart, color: Colors.white),
+                        if (carritoProvider.itemsCount > 0)
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                carritoProvider.itemsCount.toString(),
+                                style: const TextStyle(color: Colors.white, fontSize: 12),
+                              ),
+                            ),
                           ),
-                          child: Text(
-                            carritoProvider.itemsCount.toString(),
-                            style: const TextStyle(color: Colors.white, fontSize: 12),
-                          ),
+                      ],
+                    ),
+                    onPressed: () => Navigator.pushNamed(context, '/carrito'),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  // Imagen de perfil con nombre debajo
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/perfil'), // opcional
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundImage: rutaImagen != null && rutaImagen!.isNotEmpty
+                              ? FileImage(File(rutaImagen!))
+                              : const AssetImage('assets/images/usuario.png') as ImageProvider,
                         ),
                       ),
-                  ],
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/carrito');
-                },
+                    ],
+                  ),
+                  const SizedBox(width: 20), // espacio derecho final
+                ],
               );
             },
           ),
         ],
+
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
