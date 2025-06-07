@@ -12,6 +12,8 @@ import 'screens/productos_screen.dart';
 import 'screens/historial_screen.dart';
 import 'screens/carrito_screen.dart';
 import 'screens/mapa_screen.dart';
+import 'screens/confirmacion_compra.dart';
+import 'screens/perfil_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +46,8 @@ class MyApp extends StatelessWidget {
           '/historial': (context) => const HistorialScreen(),
           '/carrito': (context) => const CarritoScreen(),
           '/ubicacion': (context) => const MapaScreen(),
+          '/confirmacion_compra': (context) => const ConfirmacionCompraScreen(),
+          '/perfil': (context) => const PerfilScreen(),
         },
       ),
     );

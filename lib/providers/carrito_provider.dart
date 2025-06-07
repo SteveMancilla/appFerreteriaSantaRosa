@@ -43,4 +43,9 @@ class CarritoProvider with ChangeNotifier {
   double get subtotal => _items.fold(0, (sum, item) => sum + item.precio * item.cantidad);
   double get igv => subtotal * 0.18;
   double get total => subtotal + igv;
+
+  void limpiarCarrito() {
+    _items.clear();
+    notifyListeners();
+  }
 }

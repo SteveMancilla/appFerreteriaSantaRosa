@@ -18,7 +18,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
   String tipoSeleccionado = 'Todos';
   bool filtrarOferta = false;
 
-  final List<String> tipos = ['Todos', 'Carpintería', 'Construcción', 'Mecánica'];
+  final List<String> tipos = ['Todos', 'Carpintería', 'Construcción', 'Mecánica', 'Almacenamiento'];
   int currentIndex = 1;
 
   @override

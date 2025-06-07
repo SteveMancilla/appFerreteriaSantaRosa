@@ -1,9 +1,48 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/carrito_provider.dart';
 
 class CarritoScreen extends StatelessWidget {
   const CarritoScreen({super.key});
+
+  Future<void> procesarPago(BuildContext context) async {
+    final carrito = Provider.of<CarritoProvider>(context, listen: false);
+    final items = carrito.items;
+
+    if (items.isEmpty) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final compraId = DateTime.now().millisecondsSinceEpoch.toString();
+
+    final detallesCompra = {
+      'fecha': Timestamp.now(),
+      'subtotal': carrito.subtotal,
+      'igv': carrito.igv,
+      'total': carrito.total,
+      'productos': items.map((item) => {
+        'id': item.id,
+        'nombre': item.nombre,
+        'cantidad': item.cantidad,
+        'precio': item.precio,
+        'imagenUrl': item.imagenUrl,
+      }).toList(),
+    };
+
+    await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(user.uid)
+        .collection('compras')
+        .doc(compraId)
+        .set(detallesCompra);
+
+    carrito.limpiarCarrito();
+
+    Navigator.pushReplacementNamed(context, '/confirmacion_compra');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +74,7 @@ class CarritoScreen extends StatelessWidget {
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      constraints: const BoxConstraints(
-                        minWidth: 18,
-                        minHeight: 18,
-                      ),
+                      constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
                       child: Text(
                         '${carrito.itemsCount}',
                         style: const TextStyle(
@@ -53,7 +89,7 @@ class CarritoScreen extends StatelessWidget {
               ],
             ),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/home'); // Redirigir al home
+              Navigator.pushReplacementNamed(context, '/home');
             },
           ),
         ],
@@ -112,7 +148,7 @@ class CarritoScreen extends StatelessWidget {
                               IconButton(
                                 icon: const Icon(Icons.delete),
                                 onPressed: () {
-                                  carrito.eliminarProducto(item.id); // Eliminar producto
+                                  carrito.eliminarProducto(item.id);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text('Producto eliminado del carrito'),
@@ -157,7 +193,7 @@ class CarritoScreen extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () => procesarPago(context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFF2E205),
                                 padding: const EdgeInsets.symmetric(vertical: 16),
