@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/carrito_provider.dart';
 import '../models/carrito_item.dart';
 import 'producto_detalle_screen.dart';
@@ -15,7 +18,45 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  Timer? _inactivityTimer; // Timer para manejar el tiempo de inactividad del usuario
+
+  @override
+  void initState() {
+    super.initState();
+    cargarDatosUsuario();
+    WidgetsBinding.instance.addObserver(this);
+    _resetInactivityTimer(); // Iniciar el temporizador de inactividad
+  }
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _inactivityTimer?.cancel(); // Cancelar el temporizador de inactividad al cerrar la pantalla
+    super.dispose();
+  }
+
+  void _resetInactivityTimer() {
+    _inactivityTimer?.cancel(); // Cancelar el temporizador anterior si existe
+    _inactivityTimer = Timer(const Duration(minutes: 5), () {
+      // Si el usuario está inactivo durante 5 minutos, cerrar sesión
+      FirebaseAuth.instance.signOut();
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async{
+    if (state == AppLifecycleState.paused) {
+      // El usuario ha cerrado la aplicación o ha cambiado a otra aplicación
+      await FirebaseAuth.instance.signOut();
+      // Redirigir al usuario a la pantalla de inicio de sesión
+      if(mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+      }
+    }
+  }
   final searchController = TextEditingController();
   String searchQuery = '';
 
@@ -33,11 +74,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // cargar datos del usuario al iniciar la pantalla
-  @override
+  /*@override
   void initState() {
     super.initState();
     cargarDatosUsuario();
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
