@@ -26,6 +26,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 218, 204, 228),
       appBar: AppBar(
+        toolbarHeight: 80,
         backgroundColor: const Color(0xFF031059),
         title: const Text('Listado de Productos', style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -87,9 +88,9 @@ class _ProductosScreenState extends State<ProductosScreen> {
             Navigator.pushNamed(context, '/home');
           } else if (index == 1) {
           } else if (index == 2) {
-            Navigator.pushNamed(context, '/notificaciones');
+            Navigator.pushNamed(context, '/ubicacion');
           } else if (index == 3) {
-            Navigator.pushNamed(context, '/ajustes');
+            Navigator.pushNamed(context, '/historial');
           } else if (index == 4) {
             Navigator.pushNamed(context, '/perfil');
           }
@@ -100,8 +101,8 @@ class _ProductosScreenState extends State<ProductosScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(icon: Icon(Icons.sell), label: 'Productos'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notificaciones'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapas'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historial Compras'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),

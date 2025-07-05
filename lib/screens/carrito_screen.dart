@@ -55,6 +55,7 @@ class CarritoScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 80,
         backgroundColor: const Color(0xFF031059),
         title: const Text('Carrito de Compras', style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),

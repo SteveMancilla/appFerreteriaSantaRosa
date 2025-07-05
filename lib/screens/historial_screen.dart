@@ -35,9 +35,16 @@ class _HistorialScreenState extends State<HistorialScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F1FA),
       appBar: AppBar(
+        toolbarHeight: 80,
         backgroundColor: const Color(0xFF031059),
         title: const Text('Historial de Compras', style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+        ),
         actions: [
           const SizedBox(width: 8),
           GestureDetector(
@@ -112,6 +119,31 @@ class _HistorialScreenState extends State<HistorialScreen> {
                 );
               },
             ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 3, // ← porque estamos en Historial Compras
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.pushReplacementNamed(context, '/productos');
+          } else if (index == 2) {
+            Navigator.pushReplacementNamed(context, '/ubicacion');
+          } else if (index == 3) {
+            Navigator.pushReplacementNamed(context, '/historial');
+          } else if (index == 4) {
+            Navigator.pushReplacementNamed(context, '/perfil');
+          } else {
+            Navigator.pushReplacementNamed(context, '/home');
+          }
+        },
+        selectedItemColor: const Color(0xFF031059),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+          BottomNavigationBarItem(icon: Icon(Icons.sell), label: 'Ofertas'),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapas'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historial Compras'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+        ],
+      ),
     );
   }
 }

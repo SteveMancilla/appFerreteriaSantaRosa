@@ -14,6 +14,7 @@ import 'screens/carrito_screen.dart';
 import 'screens/mapa_screen.dart';
 import 'screens/confirmacion_compra.dart';
 import 'screens/perfil_screen.dart';
+import 'screens/sensores_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
           '/ubicacion': (context) => const MapaScreen(),
           '/confirmacion_compra': (context) => const ConfirmacionCompraScreen(),
           '/perfil': (context) => const PerfilScreen(),
+          '/sensores': (context) => const SensoresScreen(),
         },
       ),
     );
