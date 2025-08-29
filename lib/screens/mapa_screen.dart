@@ -92,9 +92,16 @@ class _MapaScreenState extends State<MapaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 80,
         title: const Text('Ubicación de la Tienda', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF031059),
         iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+        ),
       ),
       body: ubicacionUsuario == null
           ? const Center(child: CircularProgressIndicator())
@@ -105,6 +112,31 @@ class _MapaScreenState extends State<MapaScreen> {
               myLocationEnabled: true,
               onMapCreated: (controller) => _mapController = controller,
             ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 2, // ← porque estamos en Mapas
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.pushReplacementNamed(context, '/productos');
+          } else if (index == 2) {
+            // ya estás en mapas
+          } else if (index == 3) {
+            Navigator.pushReplacementNamed(context, '/historial');
+          } else if (index == 4) {
+            Navigator.pushReplacementNamed(context, '/perfil');
+          } else {
+            Navigator.pushReplacementNamed(context, '/home');
+          }
+        },
+        selectedItemColor: const Color(0xFF031059),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+          BottomNavigationBarItem(icon: Icon(Icons.sell), label: 'Ofertas'),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapas'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historial Compras'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+        ],
+      ),
     );
   }
 }

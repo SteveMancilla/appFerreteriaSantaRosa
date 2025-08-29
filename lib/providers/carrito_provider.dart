@@ -6,6 +6,9 @@ class CarritoProvider with ChangeNotifier {
 
   List<CarritoItem> get items => _items;
 
+  // Getter para obtener el número total de productos en el carrito
+  int get itemsCount => _items.fold(0, (sum, item) => sum + item.cantidad);
+
   void agregarProducto(CarritoItem producto) {
     final index = _items.indexWhere((p) => p.id == producto.id);
     if (index >= 0) {
@@ -40,4 +43,9 @@ class CarritoProvider with ChangeNotifier {
   double get subtotal => _items.fold(0, (sum, item) => sum + item.precio * item.cantidad);
   double get igv => subtotal * 0.18;
   double get total => subtotal + igv;
+
+  void limpiarCarrito() {
+    _items.clear();
+    notifyListeners();
+  }
 }

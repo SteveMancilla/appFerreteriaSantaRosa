@@ -32,16 +32,49 @@ class ProductoDetalleScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
       appBar: AppBar(
+        toolbarHeight: 80,
         backgroundColor: const Color(0xFF031059),
         title: Text(nombre, style: const TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          // Icono de compartir
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {
-              // lógica de compartir
+              // Lógica para compartir
             },
-          )
+          ),
+          // Icono del carrito con el contador
+          Consumer<CarritoProvider>(
+            builder: (context, carritoProvider, child) {
+              return IconButton(
+                icon: Stack(
+                  children: [
+                    const Icon(Icons.shopping_cart, color: Colors.white),
+                    if (carritoProvider.itemsCount > 0)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            carritoProvider.itemsCount.toString(),
+                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/carrito');
+                },
+              );
+            },
+          ),
         ],
       ),
       body: ListView(
@@ -136,9 +169,9 @@ class ProductoDetalleScreen extends StatelessWidget {
           } else if (index == 1) {
             Navigator.pushReplacementNamed(context, '/productos');
           } else if (index == 2) {
-            Navigator.pushNamed(context, '/notificaciones');
+            Navigator.pushNamed(context, '/ubicacion');
           } else if (index == 3) {
-            Navigator.pushNamed(context, '/ajustes');
+            Navigator.pushNamed(context, '/historial');
           } else if (index == 4) {
             Navigator.pushNamed(context, '/perfil');
           }
@@ -146,8 +179,8 @@ class ProductoDetalleScreen extends StatelessWidget {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(icon: Icon(Icons.sell), label: 'Productos'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notificaciones'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapas'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historial Compras'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),

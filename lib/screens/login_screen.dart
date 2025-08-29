@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,6 +16,21 @@ class _LoginScreenState extends State<LoginScreen> {
   final contraseniaController = TextEditingController();
   bool rememberMe = false;
   String errorMsg = '';
+  String? _imagenRuta;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarImagenYCorreo();
+  }
+
+  Future<void> _cargarImagenYCorreo() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _imagenRuta = prefs.getString('ultimaImagen');
+      correoController.text = prefs.getString('ultimoCorreo') ?? '';
+    });
+  }
 
   Future<void> validarLogin() async {
     final correo = correoController.text.trim();
@@ -31,6 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (credential.user != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('ultimoCorreo', correo);
+        await prefs.setString('ultimaImagen', _imagenRuta ?? '');
         Navigator.pushReplacementNamed(context, '/home');
       }
     } on FirebaseAuthException catch (e) {
@@ -56,15 +76,20 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                const Text('BIENVENIDO',
-                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white)),
+                //const Text('BIENVENIDO'),
+                //style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white)),
                 const SizedBox(height: 24),
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 50,
-                  backgroundColor: Color(0xFFF2E205),
-                  child: Icon(Icons.person, size: 50, color: Color(0xFF2D3540)),
+                  backgroundColor: const Color(0xFFF2E205),
+                  backgroundImage: _imagenRuta != null && _imagenRuta!.isNotEmpty
+                      ? FileImage(File(_imagenRuta!))
+                      : null,
+                  child: _imagenRuta == null || _imagenRuta!.isEmpty
+                      ? const Icon(Icons.person, size: 50, color: Color(0xFF2D3540))
+                      : null,
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 70),
                 TextFormField(
                   controller: correoController,
                   decoration: _buildInputDecoration('Correo'),
@@ -90,9 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Text('Recordarme', style: TextStyle(color: Colors.white)),
                     const Spacer(),
                     GestureDetector(
-                      onTap: () {
-                        // funcionalidad futura
-                      },
+                      onTap: () {},
                       child: const Text(
                         '¿Olvidaste tu contraseña?',
                         style: TextStyle(color: Colors.white, decoration: TextDecoration.underline),
@@ -119,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/register'); // ← NAVEGACIÓN CORRECTA
+                    Navigator.pushNamed(context, '/register');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6B735C),

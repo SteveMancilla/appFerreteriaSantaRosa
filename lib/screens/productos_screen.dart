@@ -18,7 +18,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
   String tipoSeleccionado = 'Todos';
   bool filtrarOferta = false;
 
-  final List<String> tipos = ['Todos', 'Carpintería', 'Construcción', 'Mecánica'];
+  final List<String> tipos = ['Todos', 'Carpintería', 'Construcción', 'Mecánica', 'Almacenamiento'];
   int currentIndex = 1;
 
   @override
@@ -26,6 +26,7 @@ class _ProductosScreenState extends State<ProductosScreen> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 218, 204, 228),
       appBar: AppBar(
+        toolbarHeight: 80,
         backgroundColor: const Color(0xFF031059),
         title: const Text('Listado de Productos', style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -36,10 +37,34 @@ class _ProductosScreenState extends State<ProductosScreen> {
           },
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart, color: Colors.white),
-            onPressed: () {
-              Navigator.pushNamed(context, '/carrito');
+          Consumer<CarritoProvider>(
+            builder: (context, carritoProvider, child) {
+              return IconButton(
+                icon: Stack(
+                  children: [
+                    const Icon(Icons.shopping_cart, color: Colors.white),
+                    if (carritoProvider.itemsCount > 0)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            carritoProvider.itemsCount.toString(),
+                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/carrito');
+                },
+              );
             },
           ),
         ],
@@ -63,9 +88,9 @@ class _ProductosScreenState extends State<ProductosScreen> {
             Navigator.pushNamed(context, '/home');
           } else if (index == 1) {
           } else if (index == 2) {
-            Navigator.pushNamed(context, '/notificaciones');
+            Navigator.pushNamed(context, '/ubicacion');
           } else if (index == 3) {
-            Navigator.pushNamed(context, '/ajustes');
+            Navigator.pushNamed(context, '/historial');
           } else if (index == 4) {
             Navigator.pushNamed(context, '/perfil');
           }
@@ -76,8 +101,8 @@ class _ProductosScreenState extends State<ProductosScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(icon: Icon(Icons.sell), label: 'Productos'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notificaciones'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapas'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historial Compras'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),
@@ -245,6 +270,10 @@ class _ProductosScreenState extends State<ProductosScreen> {
                               cantidad: 1,
                               imagenUrl: 'https://drive.google.com/uc?export=view&id=${data['imagen_drive_id']}',
                             ),
+                          );
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Producto agregado al carrito')),
                           );
                         },
                         icon: const Icon(Icons.add_shopping_cart),
