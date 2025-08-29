@@ -15,6 +15,7 @@ import 'screens/mapa_screen.dart';
 import 'screens/confirmacion_compra.dart';
 import 'screens/perfil_screen.dart';
 import 'screens/sensores_screen.dart';
+import 'screens/recomendaciones_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +52,15 @@ class MyApp extends StatelessWidget {
           '/perfil': (context) => const PerfilScreen(),
           '/sensores': (context) => const SensoresScreen(),
         },
+        onGenerateRoute: (settings) {
+            if (settings.name == '/recomendaciones') {
+              final productosComprados = settings.arguments as List<String>;
+              return MaterialPageRoute(
+                builder: (context) => RecomendacionesScreen(productosComprados: productosComprados),
+              );
+            }
+            return null; // Manejo de rutas no definidas
+          },
       ),
     );
   }
