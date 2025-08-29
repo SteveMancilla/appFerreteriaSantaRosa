@@ -135,6 +135,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 },
               ),
               ListTile(
+                leading: const Icon(Icons.recommend, color: Colors.white),
+                title: const Text('Recomendaciones', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  final carrito = Provider.of<CarritoProvider>(context, listen: false); // Aquí usa tu lista real
+                  //convertir el carritoitem a una lista de strings
+                  final productosComprados = carrito.items.map((item) => item.nombre).toList();
+                  print("Lista de productos comprados: $productosComprados");
+                  Navigator.pushNamed(
+                    context,
+                    '/recomendaciones',
+                    arguments: productosComprados,
+                  );
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.sensors, color: Colors.white),
                 title: const Text('Ver Sensores', style: TextStyle(color: Colors.white)),
                 onTap: () {
